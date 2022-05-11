@@ -1,1 +1,105 @@
+<!DOCTYPE html>
+<html>
 
+<head>
+    <title>Guessing game!</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5.0, minimum-scale=0.86">
+    <script>
+        let random_num = Math.floor((Math.random() * 100) + 1);
+        let current_guess = 0;
+        let guess_count = 1;
+        let message = "";
+        var previous_guess = [];
+        let session_data = { "random_num": random_num, "guess_count": guess_count, "previous_guess": previous_guess };
+        sessionStorage.setItem("session_data", JSON.stringify(session_data));
+        function my_output() {
+            document.getElementById("result").style.color = "red";
+            current_guess = document.getElementById("guessField").value;
+            previous_guess.push(current_guess);
+            if (guess_count < 10) {
+                if (current_guess == random_num) {
+                    End_Game();
+                } else if (current_guess < random_num) {
+                    message = document.getElementById("result").innerHTML = "Your guess is wrong!! Guess a HIGHER number.";
+                    if (Math.abs(current_guess - random_num) <= 5) {
+                        message = document.getElementById("result").innerHTML = message + " You are very close!";
+                    }
+                    Append_Table(current_guess, message);
+                } else {
+                    message = document.getElementById("result").innerHTML = "Your guess is wrong!! Guess a LOWER number.";
+                    if (Math.abs(current_guess - random_num) <= 5) {
+                        message = document.getElementById("result").innerHTML = message + " You are very close!";
+                    }
+                    Append_Table(current_guess, message);
+                }
+                Update_Session();
+                guess_count++;
+            } else {
+                End_Game();
+            }
+        }
+        function Append_Table(current_guess, message) {
+            var table = document.getElementById("result_table");
+            var row = table.insertRow(-1);
+            var cell1 = row.insertCell(0);
+            var cell2 = row.insertCell(1);
+            cell2.style.color = "red"
+            if (current_guess == random_num) {
+                cell2.style.color = "blue"
+            }
+            cell1.innerHTML = current_guess;
+            cell2.innerHTML = message;
+        }
+        function End_Game() {
+            document.getElementById("Button").disabled = true;
+            if (current_guess == random_num) {
+                document.getElementById("result").style.color = "blue";
+                message = document.getElementById("result").innerHTML = "CONGRATULATIONS!!! You guessed the number in " + guess_count + " tries.";
+            } else {
+                message = document.getElementById("result").innerHTML = "GAME OVER!! You couldn't guess the number.";
+            }
+            Update_Session();
+            Append_Table(current_guess, message);
+        }
+        function Update_Session() {
+            session_data = { "random_num": random_num, "guess_count": guess_count, "previous_guess": previous_guess };
+            sessionStorage.setItem("session_data", JSON.stringify(session_data));
+        }
+        window.onunload = function () {
+            sessionStorage.clear();
+        }
+    </script>
+    <style>
+        table,
+        td {
+            border: 0.5px solid black;
+            padding: 3px;
+        }
+        .content{
+            max-width: max-content;
+            margin: auto;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="content">
+        <h1>Number Guessing Game!</h1>
+        <p>Enter a random number between 1 and 100. See if you can guess it in <b>10</b> tries or less.</p>
+        <p id="result"> </p>
+        <label for="guessField">Enter a guess: </label><input type="text" id="guessField" class="guessField">
+        <input type="submit" id="Button" value="Submit guess" class="guessSubmit" onclick="my_output()"> <br> <br>
+        <table id="result_table">
+            <tr>
+                <td>Previoues guess</td>
+                <td>Previous message</td>
+            </tr>
+        </table>
+        <br>
+    </div>
+
+</body>
+
+</html>
